@@ -15,6 +15,14 @@ public class BinarySearchTree {
         return this.set;
     }
 
+    public Integer height(Node root) {
+        if(root == null || isLeaf(root)) {
+            return 0;
+        } else {
+            return 1 + Math.max(height(root.left), height(root.right));
+        }
+    }
+
     public Node getRoot() {
         return this.root;
     }
@@ -33,6 +41,40 @@ public class BinarySearchTree {
         }
     }
 
+    public Integer getNumNodes(Node root) {
+        if(root == null) {
+            return 0;
+        } else {
+            return 1 + (getNumNodes(root.getLeft()) + getNumNodes(root.getRight()));
+        }
+    }
+
+    public Integer leaf(Node root) {
+        if(root == null) {
+            return 0;
+        }
+
+        if(isLeaf(root)) {
+            return 1;
+        }
+        return (leaf(root.getLeft()) + leaf(root.getRight()));
+    }
+
+    public Integer internal(Node root) {
+        if(root == null || isLeaf(root)) {
+            return 0;
+        } else {
+            return 1 + (internal(root.getLeft())) + (internal(root.getRight()));            
+        }
+    }
+
+    private Boolean isLeaf(Node root) {
+        if(root.getLeft() == null && root.getRight() == null) {
+            return true;
+        }
+        return false;
+    }
+
     public void inOrderTraversal() {
         this.set = new ArrayList<>();
         doTraverse(root);
@@ -43,28 +85,19 @@ public class BinarySearchTree {
         if(root == null) {
             return root;
         }
-        else if(root.getData() < data) {
-            root.setRight(doDelete(root.getRight(), data));
-        }
-        else if(root.getData() > data) {
-            root.setLeft(doDelete(root.getLeft(), data));
-
+        if(root.data < data) {
+            root.right = doDelete(root.right, data);
+        } else if(root.data > data) {
+            root.left = doDelete(root.left, data);
         } else {
-            // Case 1: two childs
-            if(root.getLeft() != null && root.getRight() != null) {
-                Node temp = root;
-                Node minNodeOnRight = getMinNode(temp.getRight());
-                root.setData(minNodeOnRight.getData());
-                root.right = (doDelete(root.getRight(), minNodeOnRight.getData()));
-            } 
-            // Case 2: one child
-            else if(root.getRight() != null) {
-                root = (root.getRight());
-            } else if(root.getLeft() != null) {
-                root = (root.getLeft());
-            } 
-            // Case 3: no child
-            else {
+            if(root.right != null && root.left != null) {
+                root.data = getMinNode(root.right).data;
+                root.right = doDelete(root.right, root.data);
+            } else if(root.right != null) {
+                root = root.right;
+            } else if(root.left != null) {
+                root = root.left;
+            } else {
                 root = null;
             }
         }
@@ -72,12 +105,11 @@ public class BinarySearchTree {
     }
 
     private Node getMinNode(Node root) {
-        if(root.getLeft() == null) {
+        if(root.left == null) {
             return root;
         } else {
-            return getMinNode(root.getLeft());
+          return getMinNode(root.left);  
         }
-
     }
 
     private void doTraverse(Node root) {
